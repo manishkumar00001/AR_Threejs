@@ -12,8 +12,9 @@ export function addARButton(renderer, scene, camera, model) {
     font-size: 16px;
     border: none;
     background: #0a84ff;
-    color: black;
+    color: white;
     border-radius: 6px;
+    z-index: 100;
   `;
   document.body.appendChild(button);
 
@@ -41,6 +42,8 @@ export function addARButton(renderer, scene, camera, model) {
     reticle.matrixAutoUpdate = false;
     scene.add(reticle);
 
+    let placedModel = null;
+
     renderer.setAnimationLoop((timestamp, frame) => {
       if (frame) {
         const hitTestResults = frame.getHitTestResults(hitTestSource);
@@ -55,12 +58,44 @@ export function addARButton(renderer, scene, camera, model) {
       renderer.render(scene, camera);
     });
 
+    // place model on tap
     session.addEventListener("select", () => {
       if (reticle.visible && model) {
         const clone = model.clone();
         clone.position.setFromMatrixPosition(reticle.matrix);
         scene.add(clone);
+        placedModel = clone;
       }
+    });
+
+    // -------- Gesture controls --------
+    let selectedModel = null;
+    let startDistance = 0;
+    let startScale = 1;
+
+    renderer.domElement.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 1 && placedModel) {
+        selectedModel = placedModel;
+      } else if (e.touches.length === 2 && selectedModel) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        startDistance = Math.sqrt(dx * dx + dy * dy);
+        startScale = selectedModel.scale.x;
+      }
+    });
+
+    renderer.domElement.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 2 && selectedModel) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const scaleFactor = distance / startDistance;
+        selectedModel.scale.setScalar(startScale * scaleFactor);
+      }
+    });
+
+    renderer.domElement.addEventListener("touchend", () => {
+      selectedModel = null;
     });
   });
 }
