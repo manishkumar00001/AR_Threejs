@@ -1,0 +1,36 @@
+html, body, #root {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background: #f8f9fa;
+}
+
+.viewer {
+  flex: 1;
+  position: relative;
+}
+
+.sidebar {
+  width: 320px;
+  background: white;
+  padding: 20px;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+
+.status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255,255,255,0.8);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
