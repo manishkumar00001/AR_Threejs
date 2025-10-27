@@ -3,7 +3,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 export async function ModelLoader(scene, onLoaded) {
   const loader = new GLTFLoader();
-  const MODEL_URL = "/models/Sofa.glb"; // file must be inside public/models/Sofa.glb
+  const MODEL_URL = "/models/Sofa.glb"; // your sofa model path
   console.log("🔍 Loading model from:", MODEL_URL);
 
   return new Promise((resolve, reject) => {
@@ -26,17 +26,18 @@ export async function ModelLoader(scene, onLoaded) {
         const center = box.getCenter(new THREE.Vector3());
 
         // Normalize and re-center model
-        const scale = 2.0 / size; // bigger scale so it’s visible
+        const scale = 2.0 / size;
         model.scale.setScalar(scale);
         model.position.sub(center.multiplyScalar(scale));
 
-        // Bring model up a bit (so it's above the grid)
+        // Bring model slightly up so it's not below ground
         model.position.y = 0.0;
+
+        // Add model to scene
         scene.add(model);
 
-        // Add helper (so you can see where model is)
-        const axes = new THREE.AxesHelper(1);
-        scene.add(axes);
+        // 🔹 Store model reference for animation loop
+        scene.userData.model = model;
 
         if (gltf.animations.length) {
           const mixer = new THREE.AnimationMixer(model);

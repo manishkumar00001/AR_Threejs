@@ -45,12 +45,6 @@ export default function ThreeScene() {
     dirLight.position.set(3, 3, 3);
     scene.add(dirLight);
 
-    // 🔹 Grid & Helpers
-    const grid = new THREE.GridHelper(5, 20, 0x999999, 0xcccccc);
-    scene.add(grid);
-    const axes = new THREE.AxesHelper(1);
-    scene.add(axes);
-
     // 🔹 Controls
     controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0.5, 0);
@@ -75,12 +69,18 @@ export default function ThreeScene() {
     const animate = () => {
       const delta = clock.getDelta();
       if (mixer) mixer.update(delta);
+
+      // 🔹 Slowly rotate model if present
+      if (scene.userData.model) {
+        scene.userData.model.rotation.y += 0.005; // rotation speed
+      }
+
       controls.update();
       renderer.render(scene, camera);
     };
     renderer.setAnimationLoop(animate);
 
-    // 🔹 AR Button (works only on mobile or WebXR-enabled browsers)
+    // 🔹 Add AR Button
     addARButton(renderer, setXrSupported);
 
     // 🔹 Cleanup
